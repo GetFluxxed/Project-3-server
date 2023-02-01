@@ -8,22 +8,22 @@ const app = express()
 const { createServer } = require('http')
 const socketIo = require('socket.io')
 const server = createServer(app)
-const io = socketIo(server,{
+const io = socketIo(server, {
   cors: {
     // linking to react app
-    origin: 'http://localhost:3000'
+    origin: '*'
     //might need to include METHODS
   }
 })
 // config express app
-const PORT = process.env.PORT || 8000 
+const PORT = process.env.PORT || 8000
 // for debug logging 
 const rowdyResults = rowdy.begin(app)
 // cross origin resource sharing 
 app.use(cors())
 // request body parsing
 app.use(express.json())
-app.use((req,res,next)=>{
+app.use((req, res, next) => {
   req.io = io
   return next()
 })
@@ -33,17 +33,17 @@ const myMiddleware = (req, res, next) => {
   next() // makes express move on to the next route/middleware
 }
 
-io.on('connection',(socket)=>{
+io.on('connection', (socket) => {
   //console.log(socket.id)
-  socket.on('join-chat',(chatId)=>{
+  socket.on('join-chat', (chatId) => {
     socket.join(chatId)
-    console.log(chatId,"room hoined")
+    console.log(chatId, "room hoined")
   })
-  socket.on('send-comment',(message)=>{
-    console.log(message,'here')
+  socket.on('send-comment', (message) => {
+    console.log(message, 'here')
     console.log(message.comment)
-     //socket.join(message.room)
-     socket.to(`${message.room}`).emit('receive-comment',message)
+    //socket.join(message.room)
+    socket.to(`${message.room}`).emit('receive-comment', message)
   })
 
 
